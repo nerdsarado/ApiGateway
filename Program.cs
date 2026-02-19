@@ -7,7 +7,7 @@ using Polly.Extensions.Http;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-Console.Title = "🤖 GATEWAY - ROTEADOR DE PROGRAMAS COMPLETO";
+Console.Title = " GATEWAY - ROTEADOR DE PROGRAMAS COMPLETO";
 
 var builder = WebApplication.CreateBuilder(args);
 builder.WebHost.UseUrls("http://0.0.0.0:5000");
