@@ -1,0 +1,143 @@
+[
+  {
+    "ContainingType": "GatewayAPI.Controllers.GatewayController",
+    "Method": "RouteDynamic",
+    "RelativePath": "api/Gateway/{service}/{endpoint}",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "service",
+        "Type": "System.String",
+        "IsRequired": true
+      },
+      {
+        "Name": "endpoint",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GatewayAPI.Controllers.GatewayController",
+    "Method": "Callback",
+    "RelativePath": "api/Gateway/callback",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "resultado",
+        "Type": "System.Object",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GatewayAPI.Controllers.GatewayController",
+    "Method": "CadastrarCliente",
+    "RelativePath": "api/Gateway/clientes/cadastrar",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "GatewayAPI.Models.GatewayClienteRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GatewayAPI.Controllers.GatewayController",
+    "Method": "RouteRequest",
+    "RelativePath": "api/Gateway/route",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GatewayAPI.Controllers.GatewayController",
+    "Method": "ProcessarTarefa",
+    "RelativePath": "api/Gateway/tarefa",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GatewayAPI.Controllers.GatewayController",
+    "Method": "TesteEndpoint",
+    "RelativePath": "api/Gateway/teste",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "qualquerCoisa",
+        "Type": "System.Object",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GatewayAPI.Controllers.TrackingController",
+    "Method": "GetAllTrackings",
+    "RelativePath": "api/Tracking",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GatewayAPI.Controllers.TrackingController",
+    "Method": "GetTracking",
+    "RelativePath": "api/Tracking/{codigoTarefa}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "codigoTarefa",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GatewayAPI.Controllers.TrackingController",
+    "Method": "GetDashboard",
+    "RelativePath": "api/Tracking/dashboard",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GatewayAPI.Controllers.TrackingController",
+    "Method": "GetTrackingsPorTipo",
+    "RelativePath": "api/Tracking/tipo/{tipoServico}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "tipoServico",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  }
+]

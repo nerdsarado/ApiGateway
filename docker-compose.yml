@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  gateway-api:
+    image: gateway-api:latest
+    container_name: gateway-api
+    ports:
+      - "5000:5000"   # Exposta para host (opcional)
+      - "6001:6001"   # Exposta para host (opcional)
+      - "6002:6002"   # Exposta para host (opcional)
+      - "6003:6003"   # Exposta para host (opcional)
+      - "6004:6004"   # Exposta para host (opcional)"
+    expose:
+      - "5000"        # Exposta na rede Docker
+      - "6001"        # Exposta na rede Docker
+      - "6002"        # Exposta na rede Docker
+      - "6003"        # Exposta na rede Docker
+      - "6004"        # Exposta na rede Docker
+    networks:
+      - app-network
+
+  meu-projeto:
+    image: meu-projeto:latest
+    container_name: meu-projeto-app
+    ports:
+      - "8080:80"     # Exposta para acesso externo
+    environment:
+      - Services__Gateway=http://gateway-api:5000
+      - Services__Authentication=http://gateway-api:5001
+      - Services__Users=http://gateway-api:5002
+    depends_on:
+      - gateway-api
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
