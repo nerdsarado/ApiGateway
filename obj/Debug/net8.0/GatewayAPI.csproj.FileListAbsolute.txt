@@ -57,3 +57,4 @@ C:\Users\meyri\source\repos\GatewayAPI\GatewayAPI\bin\Debug\net8.0\System.IO.Pip
 C:\Users\meyri\source\repos\GatewayAPI\GatewayAPI\bin\Debug\net8.0\System.Text.Encodings.Web.dll
 C:\Users\meyri\source\repos\GatewayAPI\GatewayAPI\bin\Debug\net8.0\System.Text.Json.dll
 C:\Users\meyri\source\repos\GatewayAPI\GatewayAPI\bin\Debug\net8.0\runtimes\browser\lib\net8.0\System.Text.Encodings.Web.dll
+C:\Users\meyri\source\repos\GatewayAPI\GatewayAPI\obj\Debug\net8.0\GatewayAPI.sourcelink.json
