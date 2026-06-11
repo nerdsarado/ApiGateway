@@ -44,7 +44,7 @@ builder.Services.AddSwaggerGen(c =>
 // 4. HTTP Client Configuration
 builder.Services.AddHttpClient("GatewayClient", client =>
 {
-    client.Timeout = TimeSpan.FromSeconds(240);
+    client.Timeout = TimeSpan.FromSeconds(6000);
     client.DefaultRequestHeaders.Add("User-Agent", "GatewayAPI/1.0");
     client.DefaultRequestHeaders.Add("Accept", "application/json");
 })
@@ -54,22 +54,22 @@ builder.Services.AddHttpClient("GatewayClient", client =>
 builder.Services.AddHttpClient("ProdutoService", client =>
 {
     client.BaseAddress = new Uri("http://localhost:6001/");
-    client.Timeout = TimeSpan.FromSeconds(240);
+    client.Timeout = TimeSpan.FromSeconds(6000);
 });
 builder.Services.AddHttpClient("FornecedorService", client =>
 {
     client.BaseAddress = new Uri("http://localhost:6002/");
-    client.Timeout = TimeSpan.FromSeconds(240);
+    client.Timeout = TimeSpan.FromSeconds(6000);
 });
 builder.Services.AddHttpClient("ClienteService", client =>
 {
     client.BaseAddress = new Uri("http://localhost:6003/");
-    client.Timeout = TimeSpan.FromSeconds(240);
+    client.Timeout = TimeSpan.FromSeconds(6000);
 });
 builder.Services.AddHttpClient("DatasheetService", client =>
 {
     client.BaseAddress = new Uri("http://localhost:6004/");
-    client.Timeout = TimeSpan.FromSeconds(240); 
+    client.Timeout = TimeSpan.FromSeconds(6000); 
 })
 .AddPolicyHandler(GetRetryPolicy())
 .AddPolicyHandler(GetCircuitBreakerPolicy());
