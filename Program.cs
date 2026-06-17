@@ -4,6 +4,7 @@ using GatewayAPI.Services;
 using Microsoft.AspNetCore.Http.Json;
 using Polly;
 using Polly.Extensions.Http;
+using Polly.Timeout;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -40,16 +41,31 @@ builder.Services.AddSwaggerGen(c =>
         Description = "Gateway centralizado para comunicação com múltiplos programas"
     });
 });
+static IAsyncPolicy<HttpResponseMessage> GetTimeoutPolicy(int timeoutMinutes = 60)
+{
+    return Policy.TimeoutAsync<HttpResponseMessage>(
+        TimeSpan.FromMinutes(timeoutMinutes),
+        TimeoutStrategy.Pessimistic,
+        onTimeoutAsync: (context, timespan, task) =>
+        {
+            Console.WriteLine($"⏰ Timeout após {timespan.TotalMinutes} minutos");
+            return Task.CompletedTask;
+        }
+    );
+}
 
 // 4. HTTP Client Configuration
+var timeoutMinutes = builder.Configuration.GetValue<int>("Gateway:Timeout:HttpClientTimeoutMinutes", 60);
+
 builder.Services.AddHttpClient("GatewayClient", client =>
 {
-    client.Timeout = TimeSpan.FromSeconds(6000);
+    client.Timeout = TimeSpan.FromMinutes(timeoutMinutes);
     client.DefaultRequestHeaders.Add("User-Agent", "GatewayAPI/1.0");
     client.DefaultRequestHeaders.Add("Accept", "application/json");
 })
 .AddPolicyHandler(GetRetryPolicy())
-.AddPolicyHandler(GetCircuitBreakerPolicy());
+.AddPolicyHandler(GetCircuitBreakerPolicy())
+.AddPolicyHandler(GetTimeoutPolicy(timeoutMinutes));
 
 builder.Services.AddHttpClient("ProdutoService", client =>
 {

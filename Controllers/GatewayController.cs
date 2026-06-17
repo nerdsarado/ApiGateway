@@ -232,17 +232,14 @@ namespace GatewayAPI.Controllers
         {
             try
             {
-                // 1. Ler o corpo como string
                 using var reader = new StreamReader(Request.Body);
                 var json = await reader.ReadToEndAsync();
 
                 _logger.LogInformation("📥 [GATEWAY] JSON recebido: {Json}", json);
 
-                // 2. Parsear o JSON manualmente
                 using var doc = JsonDocument.Parse(json);
                 var root = doc.RootElement;
 
-                // 3. Extrair campos obrigatórios
                 if (!root.TryGetProperty("codigoTarefa", out var codigoTarefaProp) ||
                     !root.TryGetProperty("tipoTarefa", out var tipoTarefaProp))
                 {
@@ -257,14 +254,12 @@ namespace GatewayAPI.Controllers
                 var codigoTarefa = codigoTarefaProp.GetString() ?? string.Empty;
                 var tipoTarefa = tipoTarefaProp.GetString() ?? string.Empty;
 
-                // 4. Extrair dados (opcional)
                 JsonElement dadosProp = default;
                 var temDados = root.TryGetProperty("dados", out dadosProp);
 
                 _logger.LogInformation("🔍 [GATEWAY] Processando: {CodigoTarefa} - {TipoTarefa}",
                     codigoTarefa, tipoTarefa);
 
-                // 5. Determinar para qual serviço enviar
                 string targetUrl = tipoTarefa.ToUpper() switch
                 {
                     "PRODUTO" => "http://localhost:6001/api/produtos/cadastrar",
@@ -274,7 +269,6 @@ namespace GatewayAPI.Controllers
                     _ => throw new ArgumentException($"Tipo de tarefa inválido: {tipoTarefa}")
                 };
 
-                // 6. Preparar payload para o serviço destino
                 var payload = new
                 {
                     codigoTarefa = codigoTarefa,
@@ -283,12 +277,43 @@ namespace GatewayAPI.Controllers
 
                 _logger.LogInformation("🔀 [GATEWAY] Encaminhando para: {Url}", targetUrl);
 
-                // 7. Enviar para o serviço destino
-                var client = _httpClientFactory.CreateClient("GatewayClient");
-                var response = await client.PostAsJsonAsync(targetUrl, payload);
-                var responseContent = await response.Content.ReadAsStringAsync();
+                // ⭐⭐⭐ CRIAR CLIENTE COM TIMEOUT CORRETO ⭐⭐⭐
+                // Usar SocketsHttpHandler para .NET 5+ / .NET Core
+                var handler = new SocketsHttpHandler
+                {
+                    // ⭐ Tempo máximo de conexão
+                    ConnectTimeout = TimeSpan.FromMinutes(5),
 
-                // 8. Retornar resposta padronizada
+                    // ⭐ Tempo máximo de inatividade
+                    PooledConnectionIdleTimeout = TimeSpan.FromMinutes(5),
+
+                    // ⭐ Tempo máximo de vida da conexão
+                    PooledConnectionLifetime = TimeSpan.FromMinutes(10),
+
+                    // ⭐ Máximo de conexões simultâneas
+                    MaxConnectionsPerServer = 20,
+
+                    // ⭐ Timeout para leitura/escrita (opcional)
+                    // Nota: Isso é gerenciado pelo HttpClient.Timeout
+                };
+
+                using var client = new HttpClient(handler)
+                {
+                    // ⭐ TIMEOUT PRINCIPAL - 60 minutos
+                    Timeout = TimeSpan.FromMinutes(60)
+                };
+
+                // Headers padrão
+                client.DefaultRequestHeaders.Add("Accept", "application/json");
+                client.DefaultRequestHeaders.Add("User-Agent", "GatewayAPI/1.0");
+
+                // ⭐ Usar CancellationTokenSource com timeout
+                using var cts = new CancellationTokenSource(TimeSpan.FromMinutes(60));
+
+                // Enviar requisição
+                var response = await client.PostAsJsonAsync(targetUrl, payload, cts.Token);
+                var responseContent = await response.Content.ReadAsStringAsync(cts.Token);
+
                 if (response.IsSuccessStatusCode)
                 {
                     _logger.LogInformation("✅ [GATEWAY] Tarefa processada com sucesso: {CodigoTarefa}", codigoTarefa);
@@ -320,24 +345,14 @@ namespace GatewayAPI.Controllers
                     });
                 }
             }
-            catch (JsonException jex)
+            catch (OperationCanceledException oce) when (oce.CancellationToken.IsCancellationRequested)
             {
-                _logger.LogError(jex, "❌ [GATEWAY] JSON inválido");
-                return BadRequest(new
+                _logger.LogError(oce, "⏰ [GATEWAY] Timeout - A operação excedeu o tempo limite");
+                return StatusCode(504, new
                 {
                     sucesso = false,
-                    mensagem = "JSON inválido",
-                    detalhes = jex.Message
-                });
-            }
-            catch (ArgumentException aex)
-            {
-                _logger.LogError(aex, "❌ [GATEWAY] Tipo de tarefa inválido");
-                return BadRequest(new
-                {
-                    sucesso = false,
-                    mensagem = aex.Message,
-                    tiposSuportados = new[] { "PRODUTO", "FORNECEDOR", "CLIENTE", "DATASHEET" }
+                    mensagem = "Tempo limite excedido",
+                    detalhes = oce.Message
                 });
             }
             catch (Exception ex)
